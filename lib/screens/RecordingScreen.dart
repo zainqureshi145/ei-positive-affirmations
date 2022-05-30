@@ -1,9 +1,12 @@
-import 'package:ei_positive_affirmations/screens/PlayScreen.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:record/record.dart';
 import 'package:ei_positive_affirmations/Services/AudioFile.dart';
+import 'package:path_provider/path_provider.dart';
+import 'PlayScreen.dart';
 
 class RecordingScreen extends StatefulWidget {
   const RecordingScreen({Key? key}) : super(key: key);
@@ -17,9 +20,68 @@ class _RecordingScreenState extends State<RecordingScreen> {
   Artboard? recordButtonArtboard;
   late TextEditingController nameEditingController;
   late TextEditingController tagEditingController;
+  bool isRecording = false;
   List affirmations = [];
   List tags = [];
+  List<AudioFile> audioFileList = [];
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final record = Record();
+
+  ////////////////////////////////////////
+  //Populate audioFileList
+
+  void populateAudioFileList() async {
+    String directory = (await getApplicationDocumentsDirectory()).path;
+    String filePath =
+        "$directory/affirmations/${nameEditingController.text}.wav";
+
+    AudioFile audioFile = AudioFile(
+        tagEditingController.text, nameEditingController.text, filePath);
+    audioFileList.add(audioFile);
+
+    print(audioFile.name);
+    print(audioFile.tag);
+    print(audioFile.filePath);
+    print("Length: => + ${audioFileList.length}");
+    for (int i = 0; i <= audioFileList.length; i++) {
+      print(audioFileList[i].tag);
+    }
+  }
+
+  ////////////////////////////////////////
+
+  //Record Audio
+  void toggleRecord() async {
+    String directory = (await getApplicationDocumentsDirectory()).path;
+    if (await record.hasPermission() && isRecording == false) {
+      await record.start(
+        // path: directory +
+        //     "/affirmations" +
+        //     "/${nameEditingController.text}" +
+        //     ".wav",
+        path: "$directory/affirmations/${nameEditingController.text}.wav",
+        encoder: AudioEncoder.wav,
+        bitRate: 128000,
+        samplingRate: 44100,
+      );
+      isRecording = true;
+    } else if (await record.isRecording() == true && isRecording == true) {
+      await record.stop();
+      isRecording = false;
+    }
+  }
+
+  //Create Directory
+  void createDirectory() async {
+    String directory = (await getApplicationDocumentsDirectory()).path;
+    if (await Directory("$directory/affirmations").exists() != true) {
+      Directory("$directory/affirmations").createSync(recursive: true);
+    } else {
+      throw ErrorWidget.withDetails(
+        message: 'Cannot Create Directory',
+      );
+    }
+  }
 
 // Animations
   void recordButtonAnimation() {
@@ -35,6 +97,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   void initState() {
     super.initState();
+
+    createDirectory();
 
     // Text Controllers
     nameEditingController = TextEditingController();
@@ -70,13 +134,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
     }
   }
 
-  // CheckValues
-
-  void checkValues() {
-    print(affirmations);
-    print(tags);
-  }
-
   // Show Affirmations Dialog
   Future<String?> openAlertDialog() => showDialog<String>(
       context: context,
@@ -88,24 +145,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
               'Write a descriptive name for your affirmation',
               style: TextStyle(fontSize: 12.0),
             ),
-            // content: TextField(
-            //   cursorColor: Colors.deepPurple[300],
-            //   //style: TextStyle(color: Colors.pink[400]),
-            //   autofocus: true,
-            //   decoration: const InputDecoration(
-            //     hintText: 'Name you affirmation',
-            //     enabledBorder: UnderlineInputBorder(
-            //       borderSide: BorderSide(color: Colors.deepPurple),
-            //     ),
-            //     focusedBorder: UnderlineInputBorder(
-            //       borderSide: BorderSide(color: Colors.deepPurple),
-            //     ),
-            //   ),
-            //   controller: textEditingController,
-            // ),
             content: SizedBox(
-              height: 300,
-              width: 300,
+              height: 200,
               child: Form(
                 key: formKey,
                 child: Column(
@@ -139,7 +180,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   //validate();
                   affirmations.add(nameEditingController.text);
                   tags.add(tagEditingController.text);
-                  checkValues();
+                  populateAudioFileList();
                   Navigator.of(context).pop();
                   setState(() {});
                 },
@@ -164,6 +205,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
             content: GestureDetector(
               onTap: () {
                 recordButtonAnimation();
+                toggleRecord();
               },
               child: SizedBox(
                 width: 150,
@@ -205,11 +247,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
         child: FloatingActionButton(
           onPressed: () async {
             clearText();
-            // final affirmation = await openAlertDialog();
-            // if (affirmation == null || affirmation.isEmpty) return;
-            // affirmations.add(affirmation);
-            // print(affirmation);
-            // print(affirmations);
             openAlertDialog();
           },
           elevation: 5.0,
@@ -217,10 +254,11 @@ class _RecordingScreenState extends State<RecordingScreen> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white54,
-          ),
+          // child: const Icon(
+          //   Icons.add,
+          //   color: Colors.white54,
+          // ),
+          child: const FaIcon(FontAwesomeIcons.add),
         ),
       ),
       body: Container(
@@ -235,17 +273,10 @@ class _RecordingScreenState extends State<RecordingScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              height: 50.0,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.deepPurple[300],
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(10.0),
-                ),
-              ),
-              child: const SafeArea(
-                child: Center(
+            const SafeArea(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(top: 30.0),
                   child: Text(
                     'Record Affirmations',
                     style: TextStyle(

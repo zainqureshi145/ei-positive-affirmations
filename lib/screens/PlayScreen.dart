@@ -96,9 +96,17 @@ class _PlayScreenState extends State<PlayScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(
-                      Icons.music_note_outlined,
+                    // Icon(
+                    //   Icons.music_note_outlined,
+                    //   color: Colors.white,
+                    // ),
+                    FaIcon(
+                      FontAwesomeIcons.music,
                       color: Colors.white,
+                      size: 20,
+                    ),
+                    SizedBox(
+                      height: 7,
                     ),
                     Text(
                       'Library',
@@ -118,9 +126,17 @@ class _PlayScreenState extends State<PlayScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(
-                      Icons.list_outlined,
+                    // Icon(
+                    //   Icons.list_outlined,
+                    //   color: Colors.white,
+                    // ),
+                    FaIcon(
+                      FontAwesomeIcons.list,
                       color: Colors.white,
+                      size: 20,
+                    ),
+                    SizedBox(
+                      height: 7,
                     ),
                     Text(
                       'Playlist',
@@ -140,9 +156,17 @@ class _PlayScreenState extends State<PlayScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(
-                      Icons.settings_input_composite_outlined,
+                    // Icon(
+                    //   Icons.settings_input_composite_outlined,
+                    //   color: Colors.white,
+                    // ),
+                    FaIcon(
+                      FontAwesomeIcons.sliders,
                       color: Colors.white,
+                      size: 20,
+                    ),
+                    SizedBox(
+                      height: 7,
                     ),
                     Text(
                       'Settings',
