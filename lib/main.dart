@@ -1,3 +1,4 @@
+import 'package:ei_positive_affirmations/screens/OnBoardingScreen.dart';
 import 'package:ei_positive_affirmations/screens/PlayScreen.dart';
 import 'package:ei_positive_affirmations/screens/RecordingScreen.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +23,9 @@ class MyApp extends StatelessWidget {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: RecordingScreen(),
+      //home: RecordingScreen(),
       //home: PlayScreen(),
+      home: OnBoardingScreen(),
     );
   }
 }
