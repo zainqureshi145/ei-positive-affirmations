@@ -22,6 +22,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           PageView(
@@ -35,7 +36,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     padding: EdgeInsets.all(15.0),
                     child: Center(
                       child: Text(
-                        'Welcome to EI-Positive Affirmations',
+                        'Welcome to the Enter Inn Affirmation App',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 30.0),
                       ),
@@ -60,7 +62,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Lottie.asset('lottie/peace-3.json'),
+                  Lottie.asset('lottie/naked.json'),
                   const Padding(
                     padding: EdgeInsets.fromLTRB(15, 0, 15, 150),
                     child: Text(
@@ -74,11 +76,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Lottie.asset('lottie/list.json'),
+                  Lottie.asset('lottie/checklist.json'),
                   const Padding(
                     padding: EdgeInsets.fromLTRB(15, 0, 15, 150),
                     child: Text(
-                      'Record a list of affirmations on your own voice and listen to them with your favorite music in the background.',
+                      'Record a list of affirmations in your own voice and listen to them with your favorite music in the background.',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20.0),
                     ),
@@ -88,11 +90,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Lottie.asset('lottie/achievement.json'),
+                  Lottie.asset('lottie/success.json'),
                   const Padding(
                     padding: EdgeInsets.fromLTRB(15, 0, 15, 100),
                     child: Text(
-                      'Relax, listen to positivity and change your life. Be the one who you want to be.',
+                      'Relax, listen to your positive affirmations and change your life for the better.',
                       style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20.0),
                     ),

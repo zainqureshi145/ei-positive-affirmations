@@ -142,7 +142,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0)),
             title: const Text(
-              'Write a descriptive name for your affirmation',
+              'Write your positive affirmation below',
               style: TextStyle(fontSize: 12.0),
             ),
             content: SizedBox(
@@ -153,7 +153,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                   children: [
                     TextFormField(
                       decoration: const InputDecoration(
-                          labelText: 'Name your affirmation'),
+                          labelText: 'Write your affirmation:'),
                       validator: (value) {
                         if (value!.isEmpty) {
                           return 'Required';
