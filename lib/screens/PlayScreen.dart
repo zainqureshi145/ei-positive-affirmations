@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:rive/rive.dart';
+import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:blur/blur.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -57,7 +57,13 @@ class _PlayScreenState extends State<PlayScreen> {
         children: [
           Container(
             decoration: const BoxDecoration(
-              color: Color(0xff9575cd),
+              gradient: LinearGradient(
+                colors: [Color(0xff483553), Color(0xffb39ddb)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              //color: Color(0xff483553),
+              //color: Color(0xff9575cd),
               //color: Color(0xffb39ddb),
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(10.0),
@@ -90,7 +96,8 @@ class _PlayScreenState extends State<PlayScreen> {
                 height: 60,
                 width: 100,
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple[300],
+                  //color: Colors.deepPurple[300],
+                  color: const Color(0xff483553),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -102,7 +109,7 @@ class _PlayScreenState extends State<PlayScreen> {
                     // ),
                     FaIcon(
                       FontAwesomeIcons.music,
-                      color: Colors.white,
+                      color: Color(0xffD8CA67),
                       size: 20,
                     ),
                     SizedBox(
@@ -110,7 +117,9 @@ class _PlayScreenState extends State<PlayScreen> {
                     ),
                     Text(
                       'Library',
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: Color(0xffDADAC2),
+                      ),
                     ),
                   ],
                 ),
@@ -120,7 +129,7 @@ class _PlayScreenState extends State<PlayScreen> {
                 height: 60,
                 width: 100,
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple[300],
+                  color: const Color(0xff483553),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -132,7 +141,7 @@ class _PlayScreenState extends State<PlayScreen> {
                     // ),
                     FaIcon(
                       FontAwesomeIcons.list,
-                      color: Colors.white,
+                      color: Color(0xffD8CA67),
                       size: 20,
                     ),
                     SizedBox(
@@ -140,7 +149,9 @@ class _PlayScreenState extends State<PlayScreen> {
                     ),
                     Text(
                       'Playlist',
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: Color(0xffDADAC2),
+                      ),
                     ),
                   ],
                 ),
@@ -150,7 +161,7 @@ class _PlayScreenState extends State<PlayScreen> {
                 height: 60,
                 width: 100,
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple[300],
+                  color: const Color(0xff483553),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -162,7 +173,7 @@ class _PlayScreenState extends State<PlayScreen> {
                     // ),
                     FaIcon(
                       FontAwesomeIcons.sliders,
-                      color: Colors.white,
+                      color: Color(0xffD8CA67),
                       size: 20,
                     ),
                     SizedBox(
@@ -170,7 +181,9 @@ class _PlayScreenState extends State<PlayScreen> {
                     ),
                     Text(
                       'Settings',
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: Color(0xffDADAC2),
+                      ),
                     ),
                   ],
                 ),
@@ -179,30 +192,28 @@ class _PlayScreenState extends State<PlayScreen> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 40.0),
-            child: Blur(
-              blur: 0.1,
-              blurColor: const Color(0xffb7a8d7),
-              child: Column(
-                children: const [
-                  Text(
-                    'Thunder',
-                    style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Rubik',
-                        color: Colors.white),
+            child: Column(
+              children: const [
+                Text(
+                  'Thunder',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Rubik',
+                    color: Color(0xffDADAC2),
                   ),
-                  //SizedBox(height: 5),
-                  Text(
-                    'Imagine Dragons',
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Rubik',
-                        color: Colors.white54),
+                ),
+                //SizedBox(height: 5),
+                Text(
+                  'Imagine Dragons',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Rubik',
+                    color: Color(0xffDADAC2),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
           Row(
@@ -210,27 +221,27 @@ class _PlayScreenState extends State<PlayScreen> {
             children: const [
               FaIcon(
                 FontAwesomeIcons.arrowsRotate,
-                color: Colors.white,
+                color: Color(0xffDADAC2),
                 size: 20,
               ),
               FaIcon(
                 FontAwesomeIcons.backward,
-                color: Colors.white,
+                color: Color(0xffDADAC2),
                 size: 30,
               ),
               FaIcon(
                 FontAwesomeIcons.play,
-                color: Colors.white,
+                color: Color(0xffDADAC2),
                 size: 50,
               ),
               FaIcon(
                 FontAwesomeIcons.forward,
-                color: Colors.white,
+                color: Color(0xffDADAC2),
                 size: 30,
               ),
               FaIcon(
                 FontAwesomeIcons.shuffle,
-                color: Colors.white,
+                color: Color(0xffDADAC2),
                 size: 20,
               ),
             ],
@@ -244,8 +255,10 @@ class _PlayScreenState extends State<PlayScreen> {
               animationDuration: 2500,
               percent: 0.8,
               barRadius: const Radius.circular(5),
-              progressColor: Colors.white,
-              backgroundColor: const Color(0xffb7b8d7),
+              // progressColor: Colors.white,
+              // backgroundColor: const Color(0xffb7b8d7),
+              progressColor: const Color(0xffD8CA67),
+              backgroundColor: const Color(0xffDADAC2),
             ),
           ),
         ],

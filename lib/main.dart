@@ -29,3 +29,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+////// Purple Color 483553
+////// Gold Color D8CA67

@@ -238,159 +238,172 @@ class _RecordingScreenState extends State<RecordingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      resizeToAvoidBottomInset: false,
-      //backgroundColor: const Color(0xffE4E4E4),
-      floatingActionButton: SizedBox(
-        height: 45.0,
-        width: 80.0,
-        child: FloatingActionButton(
-          onPressed: () async {
-            clearText();
-            openAlertDialog();
-          },
-          elevation: 5.0,
-          backgroundColor: Colors.deepPurple[300],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          // child: const Icon(
-          //   Icons.add,
-          //   color: Colors.white54,
-          // ),
-          child: const FaIcon(FontAwesomeIcons.add),
-        ),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            //colors: [Color(0xFFE2C9C6), Color(0xFFE9E9E9)],
-            colors: [Color(0xffb7a8d7), Color(0xfff9f8fc)],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const SafeArea(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.only(top: 30.0),
-                  child: Text(
-                    'Record Affirmations',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                      color: Colors.white54,
-                    ),
-                  ),
-                ),
-              ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        resizeToAvoidBottomInset: false,
+        //backgroundColor: const Color(0xffE4E4E4),
+        floatingActionButton: SizedBox(
+          height: 45.0,
+          width: 80.0,
+          child: FloatingActionButton(
+            onPressed: () async {
+              clearText();
+              openAlertDialog();
+            },
+            elevation: 5.0,
+            backgroundColor: Colors.deepPurple[300],
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
             ),
-            Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                shrinkWrap: true,
-                itemCount: affirmations.length,
-                itemBuilder: (context, index) {
-                  return Dismissible(
-                    key: Key(affirmations.toString()),
-                    onDismissed: (direction) {
-                      setState(() {
-                        affirmations.removeAt(index);
-                        print(affirmations.toString());
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const PlayScreen(),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                              //colors: [Color(0xFFE2C9C6), Color(0xFFE9E9E9)],
-                              colors: [Color(0xffb7a8d7), Color(0xffb7a8d7)],
-                            ),
-                            //color: const Color(0xFFE2C9C6),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          height: 80.0,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 20.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        affirmations[index].toString(),
-                                        style: const TextStyle(
-                                            overflow: TextOverflow.fade,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15.0),
-                                        maxLines: 3,
-                                      ),
-                                      const SizedBox(
-                                        height: 10.0,
-                                      ),
-                                      Text(
-                                        '# ${tags[index]}',
-                                        style: const TextStyle(
-                                            color: Colors.black54,
-                                            overflow: TextOverflow.fade,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 12.0),
-                                        maxLines: 3,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(right: 20.0),
-                                child: Row(
-                                  children: [
-                                    MaterialButton(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(5.0),
-                                      ),
-                                      elevation: 5.0,
-                                      color: Colors.deepPurple[300],
-                                      onPressed: () {
-                                        openRecordAnimation();
-                                      },
-                                      child: const Text('Record'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+            // child: const Icon(
+            //   Icons.add,
+            //   color: Colors.white54,
+            // ),
+            child: const FaIcon(
+              FontAwesomeIcons.plus,
+              color: Color(0xffDADAC2),
+            ),
+          ),
+        ),
+        body: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                color: Color(0xff483553),
+                image: DecorationImage(
+                    image: AssetImage('images/rect.png'),
+                    fit: BoxFit.cover,
+                    opacity: 0.6),
+              ),
+              //color: const Color(0xff483553),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SafeArea(
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 30.0),
+                        child: Text(
+                          'Record Affirmations',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20.0,
+                            color: Color(0xffDADAC2),
                           ),
                         ),
                       ),
                     ),
-                  );
-                },
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: affirmations.length,
+                      itemBuilder: (context, index) {
+                        return Dismissible(
+                          key: Key(affirmations.toString()),
+                          onDismissed: (direction) {
+                            setState(() {
+                              affirmations.removeAt(index);
+                              print(affirmations.toString());
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const PlayScreen(),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topRight,
+                                    end: Alignment.bottomLeft,
+                                    //colors: [Color(0xFFE2C9C6), Color(0xFFE9E9E9)],
+                                    colors: [
+                                      Color(0xffb7a8d7),
+                                      Color(0xffb7a8d7)
+                                    ],
+                                  ),
+                                  //color: const Color(0xFFE2C9C6),
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                height: 80.0,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 20.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              affirmations[index].toString(),
+                                              style: const TextStyle(
+                                                  overflow: TextOverflow.fade,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15.0),
+                                              maxLines: 3,
+                                            ),
+                                            const SizedBox(
+                                              height: 10.0,
+                                            ),
+                                            Text(
+                                              '# ${tags[index]}',
+                                              style: const TextStyle(
+                                                  color: Colors.black54,
+                                                  overflow: TextOverflow.fade,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12.0),
+                                              maxLines: 3,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 20.0),
+                                      child: Row(
+                                        children: [
+                                          MaterialButton(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                            ),
+                                            elevation: 5.0,
+                                            color: Colors.deepPurple[300],
+                                            onPressed: () {
+                                              openRecordAnimation();
+                                            },
+                                            child: const Text('Record'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
-        ),
-      ),
-    );
+        ));
   }
 }
