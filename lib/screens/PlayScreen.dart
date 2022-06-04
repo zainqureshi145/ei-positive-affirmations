@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:blur/blur.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 class PlayScreen extends StatefulWidget {
