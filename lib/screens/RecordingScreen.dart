@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:record/record.dart';
-import 'package:ei_positive_affirmations/Services/AudioFile.dart';
+import 'package:ei_positive_affirmations/model/recording.dart';
 import 'package:path_provider/path_provider.dart';
 import 'PlayScreen.dart';
 
@@ -21,32 +22,35 @@ class _RecordingScreenState extends State<RecordingScreen> {
   late TextEditingController nameEditingController;
   late TextEditingController tagEditingController;
   bool isRecording = false;
-  List affirmations = [];
-  List tags = [];
-  List<AudioFile> audioFileList = [];
+  List<Recording> recordings = [];
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final record = Record();
 
+  void saveData() async {
+    // Hive Open Box
+    final affirmationsBox = await Hive.openBox('affirmations');
+  }
+
   ////////////////////////////////////////
   //Populate audioFileList
-
-  void populateAudioFileList() async {
-    String directory = (await getApplicationDocumentsDirectory()).path;
-    String filePath =
-        "$directory/affirmations/${nameEditingController.text}.wav";
-
-    AudioFile audioFile = AudioFile(
-        tagEditingController.text, nameEditingController.text, filePath);
-    audioFileList.add(audioFile);
-
-    print(audioFile.name);
-    print(audioFile.tag);
-    print(audioFile.filePath);
-    print("Length: => + ${audioFileList.length}");
-    for (int i = 0; i <= audioFileList.length; i++) {
-      print(audioFileList[i].tag);
-    }
-  }
+  //
+  // void populateAudioFileList() async {
+  //   String directory = (await getApplicationDocumentsDirectory()).path;
+  //   String filePath =
+  //       "$directory/affirmations/${nameEditingController.text}.wav";
+  //
+  //   Recording audioFile = Recording(
+  //       tagEditingController.text, nameEditingController.text, filePath);
+  //   recordings.add(audioFile);
+  //
+  //   print(audioFile.name);
+  //   print(audioFile.tag);
+  //   print(audioFile.filePath);
+  //   print("Length: => + ${recordings.length}");
+  //   for (int i = 0; i <= recordings.length; i++) {
+  //     print(recordings[i].tag);
+  //   }
+  // }
 
   ////////////////////////////////////////
 
@@ -55,10 +59,6 @@ class _RecordingScreenState extends State<RecordingScreen> {
     String directory = (await getApplicationDocumentsDirectory()).path;
     if (await record.hasPermission() && isRecording == false) {
       await record.start(
-        // path: directory +
-        //     "/affirmations" +
-        //     "/${nameEditingController.text}" +
-        //     ".wav",
         path: "$directory/affirmations/${nameEditingController.text}.wav",
         encoder: AudioEncoder.wav,
         bitRate: 128000,
@@ -175,12 +175,13 @@ class _RecordingScreenState extends State<RecordingScreen> {
             actions: [
               TextButton(
                 style: TextButton.styleFrom(primary: Colors.deepPurple[300]),
-                onPressed: () {
-                  //Navigator.of(context).pop(textEditingController.text);
-                  //validate();
-                  affirmations.add(nameEditingController.text);
-                  tags.add(tagEditingController.text);
-                  populateAudioFileList();
+                onPressed: () async {
+                  String directory =
+                      (await getApplicationDocumentsDirectory()).path;
+                  String filePath =
+                      "$directory/affirmations/${nameEditingController.text}.wav";
+                  recordings.add(Recording(tagEditingController.text,
+                      nameEditingController.text, filePath));
                   Navigator.of(context).pop();
                   setState(() {});
                 },
@@ -297,14 +298,14 @@ class _RecordingScreenState extends State<RecordingScreen> {
                     child: ListView.builder(
                       scrollDirection: Axis.vertical,
                       shrinkWrap: true,
-                      itemCount: affirmations.length,
+                      itemCount: recordings.length,
                       itemBuilder: (context, index) {
                         return Dismissible(
-                          key: Key(affirmations.toString()),
+                          key: Key(recordings.toString()),
                           onDismissed: (direction) {
                             setState(() {
-                              affirmations.removeAt(index);
-                              print(affirmations.toString());
+                              recordings.removeAt(index);
+                              print(recordings.toString());
                             });
                           },
                           child: Padding(
@@ -348,7 +349,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                                               MainAxisAlignment.center,
                                           children: [
                                             Text(
-                                              affirmations[index].toString(),
+                                              recordings[index].name,
                                               style: const TextStyle(
                                                   overflow: TextOverflow.fade,
                                                   fontWeight: FontWeight.bold,
@@ -359,7 +360,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                                               height: 10.0,
                                             ),
                                             Text(
-                                              '# ${tags[index]}',
+                                              '# ${recordings[index].tag}',
                                               style: const TextStyle(
                                                   color: Colors.black54,
                                                   overflow: TextOverflow.fade,
