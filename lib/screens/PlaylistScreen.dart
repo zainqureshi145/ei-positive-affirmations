@@ -12,10 +12,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GridView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: ,
-      ),
+      body: Container(),
     );
   }
 }
