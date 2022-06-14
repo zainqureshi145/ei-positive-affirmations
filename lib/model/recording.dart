@@ -11,14 +11,6 @@ class Recording {
   late String path;
 
   Recording({required this.name, required this.tag, required this.path});
-  // Recording.fromMap(Map<String, dynamic> map) {
-  //   name:
-  //   map[columnName];
-  //   tag:
-  //   map[columnTag];
-  //   filePath:
-  //   map[filePath];
-  // }
   Recording.fromMap(Map<String, dynamic> map) {
     name = map[columnName];
     tag = map[columnTag];

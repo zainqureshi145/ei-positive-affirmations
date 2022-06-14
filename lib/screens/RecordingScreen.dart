@@ -164,6 +164,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                     name: nameEditingController.text,
                     tag: tagEditingController.text,
                     path: filePath));
+                //await dbHelper.fetchTags();
                 Navigator.of(context).pop();
                 setState(() {
                   refreshRecordingList();

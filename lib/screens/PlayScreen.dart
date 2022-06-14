@@ -1,3 +1,5 @@
+import 'package:ei_positive_affirmations/screens/AndroidLibraryScreen.dart';
+import 'package:ei_positive_affirmations/screens/PlaylistScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
@@ -91,68 +93,88 @@ class _PlayScreenState extends State<PlayScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                height: 60,
-                width: 100,
-                decoration: BoxDecoration(
-                  //color: Colors.deepPurple[300],
-                  color: const Color(0xff483553),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    // Icon(
-                    //   Icons.music_note_outlined,
-                    //   color: Colors.white,
-                    // ),
-                    FaIcon(
-                      FontAwesomeIcons.music,
-                      color: Color(0xffD8CA67),
-                      size: 20,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AndroidLibraryScreen(),
                     ),
-                    SizedBox(
-                      height: 7,
-                    ),
-                    Text(
-                      'Library',
-                      style: TextStyle(
-                        color: Color(0xffDADAC2),
+                  );
+                },
+                child: Container(
+                  height: 60,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    //color: Colors.deepPurple[300],
+                    color: const Color(0xff483553),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      // Icon(
+                      //   Icons.music_note_outlined,
+                      //   color: Colors.white,
+                      // ),
+                      FaIcon(
+                        FontAwesomeIcons.music,
+                        color: Color(0xffD8CA67),
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 7,
+                      ),
+                      Text(
+                        'Library',
+                        style: TextStyle(
+                          color: Color(0xffDADAC2),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 20),
-              Container(
-                height: 60,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: const Color(0xff483553),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    // Icon(
-                    //   Icons.list_outlined,
-                    //   color: Colors.white,
-                    // ),
-                    FaIcon(
-                      FontAwesomeIcons.list,
-                      color: Color(0xffD8CA67),
-                      size: 20,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const PlaylistScreen(),
                     ),
-                    SizedBox(
-                      height: 7,
-                    ),
-                    Text(
-                      'Playlist',
-                      style: TextStyle(
-                        color: Color(0xffDADAC2),
+                  );
+                },
+                child: Container(
+                  height: 60,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff483553),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      // Icon(
+                      //   Icons.list_outlined,
+                      //   color: Colors.white,
+                      // ),
+                      FaIcon(
+                        FontAwesomeIcons.list,
+                        color: Color(0xffD8CA67),
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 7,
+                      ),
+                      Text(
+                        'Playlist',
+                        style: TextStyle(
+                          color: Color(0xffDADAC2),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 20),
