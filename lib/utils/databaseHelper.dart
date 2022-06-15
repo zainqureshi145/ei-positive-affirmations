@@ -10,6 +10,7 @@ class DatabaseHelper {
   var setOfTags = [];
   //List<Recording> allTags = [];
   List<String> allTags = [];
+  List<String> allNames = [];
 
   // Convert to Singleton Constructor/Class
   DatabaseHelper._();
@@ -93,5 +94,17 @@ class DatabaseHelper {
       }
     }
     return allTags;
+  }
+
+  Future<List> fetchPathOfGroupedTags(String tag) async {
+    allNames.clear();
+    Database db = await database;
+    List<Map> list = await db.query(Recording.tableName,
+        where: '${Recording.columnTag} = ?', whereArgs: [tag]);
+    for (int i = 0; i < list.length; i++) {
+      allNames.add(list[i]['path']);
+    }
+    print(allNames);
+    return allNames;
   }
 }

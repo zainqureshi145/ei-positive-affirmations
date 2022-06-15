@@ -8,7 +8,6 @@ import 'package:on_audio_query/on_audio_query.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-
 import '../utils/databaseHelper.dart';
 
 class PlayScreen extends StatefulWidget {
@@ -110,6 +109,8 @@ class _PlayScreenState extends State<PlayScreen> {
 
   var allTags = [];
   var setsOfTags = [];
+  var allTagsPath = [];
+  var setsOfTagsPath = [];
   late DatabaseHelper dbHelper;
 
   getTags() async {
@@ -119,6 +120,14 @@ class _PlayScreenState extends State<PlayScreen> {
     print(setsOfTags);
     //print('All Tags: $allTags');
     return setsOfTags;
+  }
+
+  getPathOfTags(String tag) async {
+    var x = await dbHelper.fetchPathOfGroupedTags(tag);
+    allTagsPath = x;
+    setsOfTagsPath = allTagsPath.toSet().toList();
+    print('Usable List? => $setsOfTagsPath');
+    return setsOfTagsPath;
   }
 
   /////////////////////////////////////////////////////ALERT DIALOGS
@@ -239,9 +248,6 @@ class _PlayScreenState extends State<PlayScreen> {
                                     await songPlayer.setAudioSource(
                                         AudioSource.uri(Uri.parse(uri!)));
                                     await songPlayer.play();
-                                    await affirmationPlayer.setAudioSource(
-                                        AudioSource.uri(Uri.parse('')));
-                                    await affirmationPlayer.play();
                                   },
                                   child: const FaIcon(
                                     FontAwesomeIcons.play,
@@ -316,6 +322,7 @@ class _PlayScreenState extends State<PlayScreen> {
                           onTap: () {
                             String? playlist = setsOfTags[index].toString();
                             finalPlaylistName = playlist;
+                            getPathOfTags(playlist);
                             Navigator.of(context).pop();
                             setState(() {});
                             // Navigator.push(
@@ -590,9 +597,16 @@ class _PlayScreenState extends State<PlayScreen> {
               ),
               GestureDetector(
                 onTap: () async {
+                  playRecordAnimation();
                   await songPlayer
                       .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
                   await songPlayer.play();
+                  for (int i = 0; i < setsOfTagsPath.length; i++) {
+                    print('Now Playing =====> ${setsOfTagsPath[i]}');
+                    await affirmationPlayer.setAudioSource(
+                        AudioSource.uri(Uri.parse(setsOfTagsPath[i])));
+                    await affirmationPlayer.play();
+                  }
                 },
                 child: const FaIcon(
                   FontAwesomeIcons.play,
@@ -605,7 +619,7 @@ class _PlayScreenState extends State<PlayScreen> {
                 color: Color(0xffDADAC2),
                 size: 30,
               ),
-              FaIcon(
+              const FaIcon(
                 FontAwesomeIcons.shuffle,
                 color: Color(0xffDADAC2),
                 size: 20,
