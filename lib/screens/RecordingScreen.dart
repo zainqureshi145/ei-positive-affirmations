@@ -75,8 +75,8 @@ class _RecordingScreenState extends State<RecordingScreen> {
     if (await record.hasPermission() && isRecording == false) {
       await record.start(
         //TODO: Get This Path From Database and Not From Controller
-        path: "$directory/affirmations/${nameEditingController.text}.wav",
-        encoder: AudioEncoder.wav,
+        path: "$directory/affirmations/${nameEditingController.text}.m4a",
+        encoder: AudioEncoder.aacLc,
         bitRate: 128000,
         samplingRate: 44100,
       );
@@ -159,7 +159,7 @@ class _RecordingScreenState extends State<RecordingScreen> {
                 String directory =
                     (await getApplicationDocumentsDirectory()).path;
                 String filePath =
-                    "$directory/affirmations/${nameEditingController.text}.wav";
+                    "$directory/affirmations/${nameEditingController.text}.m4a";
                 await dbHelper.insertRecording(Recording(
                     name: nameEditingController.text,
                     tag: tagEditingController.text,

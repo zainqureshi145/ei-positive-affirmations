@@ -598,9 +598,9 @@ class _PlayScreenState extends State<PlayScreen> {
               GestureDetector(
                 onTap: () async {
                   playRecordAnimation();
-                  await songPlayer
-                      .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
-                  await songPlayer.play();
+                  // await songPlayer
+                  //     .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
+                  // await songPlayer.play();
                   for (int i = 0; i < setsOfTagsPath.length; i++) {
                     print('Now Playing =====> ${setsOfTagsPath[i]}');
                     await affirmationPlayer.setAudioSource(
