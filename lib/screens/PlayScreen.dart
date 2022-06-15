@@ -9,6 +9,7 @@ import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import '../utils/databaseHelper.dart';
+//import 'package:assets_audio_player/assets_audio_player.dart';
 
 class PlayScreen extends StatefulWidget {
   const PlayScreen({Key? key}) : super(key: key);
@@ -244,6 +245,7 @@ class _PlayScreenState extends State<PlayScreen> {
                                         'Playing ${item.data![index].title}');
 
                                     String? uri = item.data![index].uri;
+                                    print('URI: $uri');
 
                                     await songPlayer.setAudioSource(
                                         AudioSource.uri(Uri.parse(uri!)));
@@ -319,9 +321,10 @@ class _PlayScreenState extends State<PlayScreen> {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             String? playlist = setsOfTags[index].toString();
                             finalPlaylistName = playlist;
+                            //print(playlist);
                             getPathOfTags(playlist);
                             Navigator.of(context).pop();
                             setState(() {});
@@ -596,17 +599,47 @@ class _PlayScreenState extends State<PlayScreen> {
                 size: 30,
               ),
               GestureDetector(
+                // onTap: () async {
+                //   playRecordAnimation();
+                //   await songPlayer
+                //       .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
+                //   await songPlayer.setVolume(0.02);
+                //   for (int i = 0; i < setsOfTagsPath.length; i++) {
+                //     print('Now Playing =====> ${setsOfTagsPath[i]}');
+                //     //print(setsOfTagsPath[i]);
+                //     await affirmationPlayer.setAudioSource(
+                //         AudioSource.uri(Uri.parse(setsOfTagsPath[i])));
+                //     await affirmationPlayer.setVolume(1.0);
+                //     await affirmationPlayer.play();
+                //   }
+                //   songPlayer.play();
+                //   setState(() {});
+                // },
                 onTap: () async {
                   playRecordAnimation();
-                  // await songPlayer
-                  //     .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
-                  // await songPlayer.play();
-                  for (int i = 0; i < setsOfTagsPath.length; i++) {
-                    print('Now Playing =====> ${setsOfTagsPath[i]}');
+                  await songPlayer
+                      .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
+                  await songPlayer.setVolume(0.02);
+                  for (int x = 0; x <= setsOfTagsPath.length; x++) {
                     await affirmationPlayer.setAudioSource(
-                        AudioSource.uri(Uri.parse(setsOfTagsPath[i])));
+                      ConcatenatingAudioSource(
+                        useLazyPreparation: true,
+                        shuffleOrder: DefaultShuffleOrder(),
+                        children: [
+                          AudioSource.uri(Uri.parse(setsOfTagsPath[x])),
+                        ],
+                      ),
+                      //initialIndex: 0,
+                      //initialPosition: Duration.zero,
+                    );
+                    //await affirmationPlayer.seekToNext();
+                    //await affirmationPlayer.seekToPrevious();
+                    //await affirmationPlayer.seek(Duration(milliseconds: 0), index: 2);
+                    await affirmationPlayer.setLoopMode(LoopMode.all);
                     await affirmationPlayer.play();
                   }
+                  songPlayer.play();
+                  setState(() {});
                 },
                 child: const FaIcon(
                   FontAwesomeIcons.play,
