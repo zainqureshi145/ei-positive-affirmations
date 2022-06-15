@@ -1,8 +1,21 @@
+import 'package:ei_positive_affirmations/screens/PlayScreen.dart';
 import 'package:ei_positive_affirmations/utils/databaseHelper.dart';
 import 'package:flutter/material.dart';
 
 class PlaylistScreen extends StatefulWidget {
-  const PlaylistScreen({Key? key}) : super(key: key);
+  //const PlaylistScreen({Key? key}) : super(key: key);
+
+  PlaylistScreen(
+      {this.uri,
+      this.title,
+      this.playlist,
+      this.recordingPath,
+      this.recording});
+  final String? uri;
+  final String? title;
+  final String? playlist;
+  final String? recordingPath;
+  final String? recording;
 
   @override
   State<PlaylistScreen> createState() => _PlaylistScreenState();
@@ -67,26 +80,39 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            begin: Alignment.topRight,
-                            end: Alignment.bottomLeft,
-                            //colors: [Color(0xFFE2C9C6), Color(0xFFE9E9E9)],
-                            colors: [Color(0xffb7a8d7), Color(0xffb7a8d7)],
+                      child: GestureDetector(
+                        onTap: () {
+                          String? playlist = setsOfTags[index].toString();
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => PlayScreen(
+                          //       playlist: playlist,
+                          //     ),
+                          //   ),
+                          // );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              //colors: [Color(0xFFE2C9C6), Color(0xFFE9E9E9)],
+                              colors: [Color(0xffb7a8d7), Color(0xffb7a8d7)],
+                            ),
+                            //color: const Color(0xFFE2C9C6),
+                            borderRadius: BorderRadius.circular(10.0),
                           ),
-                          //color: const Color(0xFFE2C9C6),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Center(
-                          child: Text(
-                            setsOfTags[index].toString(),
-                            style: const TextStyle(
-                                color: Colors.black54,
-                                overflow: TextOverflow.fade,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20.0),
-                            maxLines: 3,
+                          child: Center(
+                            child: Text(
+                              setsOfTags[index].toString(),
+                              style: const TextStyle(
+                                  color: Colors.black54,
+                                  overflow: TextOverflow.fade,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20.0),
+                              maxLines: 3,
+                            ),
                           ),
                         ),
                       ),

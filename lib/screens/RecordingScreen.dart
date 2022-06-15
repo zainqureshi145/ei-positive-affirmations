@@ -308,6 +308,17 @@ class _RecordingScreenState extends State<RecordingScreen> {
             padding: const EdgeInsets.all(8.0),
             child: GestureDetector(
               onTap: () {
+                String recordingPath = recordings[index].path;
+                String recording = recordings[index].name;
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => PlayScreen(
+                //       recordingPath: recordingPath,
+                //       recording: recording,
+                //     ),
+                //   ),
+                // );
                 Navigator.push(
                   context,
                   MaterialPageRoute(
