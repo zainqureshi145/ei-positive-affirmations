@@ -620,6 +620,7 @@ class _PlayScreenState extends State<PlayScreen> {
                   await songPlayer
                       .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
                   await songPlayer.setVolume(0.02);
+                  songPlayer.play();
                   for (int x = 0; x <= setsOfTagsPath.length; x++) {
                     await affirmationPlayer.setAudioSource(
                       ConcatenatingAudioSource(
@@ -629,16 +630,10 @@ class _PlayScreenState extends State<PlayScreen> {
                           AudioSource.uri(Uri.parse(setsOfTagsPath[x])),
                         ],
                       ),
-                      //initialIndex: 0,
-                      //initialPosition: Duration.zero,
                     );
-                    //await affirmationPlayer.seekToNext();
-                    //await affirmationPlayer.seekToPrevious();
-                    //await affirmationPlayer.seek(Duration(milliseconds: 0), index: 2);
-                    await affirmationPlayer.setLoopMode(LoopMode.all);
+                    //await affirmationPlayer.setLoopMode(LoopMode.one);
                     await affirmationPlayer.play();
                   }
-                  songPlayer.play();
                   setState(() {});
                 },
                 child: const FaIcon(
