@@ -1,5 +1,4 @@
-import 'package:ei_positive_affirmations/screens/AndroidLibraryScreen.dart';
-import 'package:ei_positive_affirmations/screens/PlaylistScreen.dart';
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,23 +6,11 @@ import 'package:just_audio/just_audio.dart';
 import 'package:on_audio_query/on_audio_query.dart';
 import 'package:rive/rive.dart' hide LinearGradient;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+import 'package:rxdart/rxdart.dart';
 import '../utils/databaseHelper.dart';
-//import 'package:assets_audio_player/assets_audio_player.dart';
 
 class PlayScreen extends StatefulWidget {
   const PlayScreen({Key? key}) : super(key: key);
-  // PlayScreen(
-  //     {this.uri,
-  //     this.title,
-  //     this.playlist,
-  //     this.recordingPath,
-  //     this.recording});
-  // final String? uri;
-  // final String? title;
-  // final String? playlist;
-  // final String? recordingPath;
-  // final String? recording;
 
   @override
   State<PlayScreen> createState() => _PlayScreenState();
@@ -49,6 +36,13 @@ class _PlayScreenState extends State<PlayScreen> {
     }
   }
 
+  Stream<DurationState> get durationStateStream =>
+      Rx.combineLatest2<Duration, Duration?, DurationState>(
+          songPlayer.positionStream,
+          songPlayer.durationStream,
+          (position, duration) => DurationState(
+              position: position, total: duration ?? Duration.zero));
+
   @override
   void initState() {
     requestStoragePermission();
@@ -67,6 +61,11 @@ class _PlayScreenState extends State<PlayScreen> {
         playButtonArtboard = artboard;
       });
     });
+    songPlayer.currentIndexStream.listen((index) {
+      if (index != null) {
+        updateCurrentPlayingSongDetails(index);
+      }
+    });
   }
 
   ////////////////////////////////////////////////////////////Alert Dialog Specific
@@ -77,11 +76,73 @@ class _PlayScreenState extends State<PlayScreen> {
   // Audio Player
   final AudioPlayer songPlayer = AudioPlayer();
   final AudioPlayer affirmationPlayer = AudioPlayer();
+  List<SongModel> songs = [];
+  List<SongModel> itemData = [];
+  String currentSongTitle = '';
+  int currentIndex = 0;
+  bool isPlayerViewVisible = false;
+  bool isPlaying = false;
+  double affirmationVolume = 1.0;
+  double songVolume = 0.2;
+  Duration songDuration = const Duration();
+
+  // Method to set player view visibility
+
+  void changePlayerViewVisibility() {
+    setState(() {
+      isPlayerViewVisible = !isPlayerViewVisible;
+    });
+  }
+
+  // Music Control Functions
+
+  playAffirmations() async {
+    int x = 0;
+    for (x = 0; x <= setsOfTagsPath.length; x++) {
+      await affirmationPlayer.setAudioSource(
+        ConcatenatingAudioSource(
+          useLazyPreparation: true,
+          shuffleOrder: DefaultShuffleOrder(),
+          children: [
+            AudioSource.uri(Uri.parse(setsOfTagsPath[x])),
+          ],
+        ),
+      );
+      //await affirmationPlayer.setLoopMode(LoopMode.one);
+      await affirmationPlayer.setVolume(affirmationVolume);
+      await affirmationPlayer.play();
+    }
+    x = 0;
+  }
+
+  playSong() async {
+    await songPlayer.setAudioSource(createPlaylist(itemData), initialIndex: 0);
+    await songPlayer.play();
+  }
+
+  playSelectedSong() async {
+    await songPlayer.setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
+    await songPlayer.play();
+  }
+
+  togglePlayback() {
+    if (isPlaying == false) {
+      //playSong();
+      playSelectedSong();
+      playAffirmations();
+      isPlaying = true;
+    } else {
+      songPlayer.stop();
+      affirmationPlayer.stop();
+      isPlaying = false;
+    }
+  }
 
   @override
   void dispose() {
     super.dispose();
     songPlayer.dispose();
+    affirmationPlayer.dispose();
   }
 
   void requestStoragePermission() async {
@@ -163,6 +224,12 @@ class _PlayScreenState extends State<PlayScreen> {
               if (item.data!.isEmpty) {
                 return const Text('No songs found on this device');
               }
+
+              /// Add Songs to the song List
+              itemData = item.data!;
+              songs.clear();
+              songs = item.data!;
+              ///////////////////////////
               return Container(
                 height: 300,
                 width: 600,
@@ -182,15 +249,6 @@ class _PlayScreenState extends State<PlayScreen> {
                           finalUri = uri!;
                           Navigator.of(context).pop();
                           setState(() {});
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => PlayScreen(
-                          //       uri: uri,
-                          //       title: title,
-                          //     ),
-                          //   ),
-                          // );
                         },
                         child: Container(
                           height: 90,
@@ -385,12 +443,133 @@ class _PlayScreenState extends State<PlayScreen> {
         ),
       );
 
+  Future<String?> openSettings() => showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.deepPurple[300],
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          title: const Center(
+            child: Text(
+              'Sound Mixing',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20.0,
+                color: Color(0xffDADAC2),
+              ),
+            ),
+          ),
+          content: SizedBox(
+            height: 200,
+            child: Column(
+              children: [
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: const Color(0xffD8CA67),
+                    inactiveTrackColor: Colors.red[100],
+                    trackShape: const RoundedRectSliderTrackShape(),
+                    trackHeight: 4.0,
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                    thumbColor: const Color(0xffD8CA67),
+                    overlayColor: Colors.red.withAlpha(32),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 28.0,
+                    ),
+                    tickMarkShape: const RoundSliderTickMarkShape(),
+                    activeTickMarkColor: const Color(0xffDADAC2),
+                    inactiveTickMarkColor: Colors.red[100],
+                    valueIndicatorShape:
+                        const PaddleSliderValueIndicatorShape(),
+                    valueIndicatorColor: const Color(0xffDADAC2),
+                    valueIndicatorTextStyle:
+                        const TextStyle(color: Color(0xffD8CA67)),
+                  ),
+                  child: Slider(
+                    value: songVolume,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 10,
+                    label: songVolume.toStringAsFixed(2),
+                    onChanged: (double newVolume) {
+                      setState(
+                        () {
+                          songVolume = newVolume;
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const Center(
+                  child: Text(
+                    'Adjust music volume',
+                    style: TextStyle(
+                        color: Colors.black54,
+                        overflow: TextOverflow.fade,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0),
+                    maxLines: 3,
+                  ),
+                ),
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    activeTrackColor: const Color(0xffD8CA67),
+                    inactiveTrackColor: Colors.red[100],
+                    trackShape: const RoundedRectSliderTrackShape(),
+                    trackHeight: 4.0,
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 12.0),
+                    thumbColor: const Color(0xffD8CA67),
+                    overlayColor: Colors.red.withAlpha(32),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 28.0,
+                    ),
+                    tickMarkShape: const RoundSliderTickMarkShape(),
+                    activeTickMarkColor: const Color(0xffDADAC2),
+                    inactiveTickMarkColor: Colors.red[100],
+                    valueIndicatorShape:
+                        const PaddleSliderValueIndicatorShape(),
+                    valueIndicatorColor: const Color(0xffDADAC2),
+                    valueIndicatorTextStyle:
+                        const TextStyle(color: Color(0xffD8CA67)),
+                  ),
+                  child: Slider(
+                    value: affirmationVolume,
+                    min: 0.0,
+                    max: 1.0,
+                    divisions: 10,
+                    label: affirmationVolume.toStringAsFixed(2),
+                    onChanged: (double newVolume) {
+                      setState(
+                        () {
+                          affirmationVolume = newVolume;
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const Center(
+                  child: Text(
+                    'Adjust affirmation volume',
+                    style: TextStyle(
+                        color: Colors.black54,
+                        overflow: TextOverflow.fade,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0),
+                    maxLines: 3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
   //////////////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      //backgroundColor: const Color(0xfff9f8fc),
       backgroundColor: const Color(0xffb7a8d7),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -403,16 +582,12 @@ class _PlayScreenState extends State<PlayScreen> {
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              //color: Color(0xff483553),
-              //color: Color(0xff9575cd),
-              //color: Color(0xffb39ddb),
               borderRadius: BorderRadius.vertical(
                 bottom: Radius.circular(10.0),
               ),
             ),
             height: 250,
             width: double.infinity,
-            //child: const Center(child: Text('Hello World')),
             child: playButtonArtboard == null
                 ? const SizedBox()
                 : GestureDetector(
@@ -435,29 +610,18 @@ class _PlayScreenState extends State<PlayScreen> {
             children: [
               GestureDetector(
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => AndroidLibraryScreen(),
-                  //   ),
-                  // );
                   openLibrary();
                 },
                 child: Container(
                   height: 60,
                   width: 100,
                   decoration: BoxDecoration(
-                    //color: Colors.deepPurple[300],
                     color: const Color(0xff483553),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: const [
-                      // Icon(
-                      //   Icons.music_note_outlined,
-                      //   color: Colors.white,
-                      // ),
                       FaIcon(
                         FontAwesomeIcons.music,
                         color: Color(0xffD8CA67),
@@ -520,41 +684,82 @@ class _PlayScreenState extends State<PlayScreen> {
                 ),
               ),
               const SizedBox(width: 20),
-              Container(
-                height: 60,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: const Color(0xff483553),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    // Icon(
-                    //   Icons.settings_input_composite_outlined,
-                    //   color: Colors.white,
-                    // ),
-                    FaIcon(
-                      FontAwesomeIcons.sliders,
-                      color: Color(0xffD8CA67),
-                      size: 20,
-                    ),
-                    SizedBox(
-                      height: 7,
-                    ),
-                    Text(
-                      'Settings',
-                      style: TextStyle(
-                        color: Color(0xffDADAC2),
+              GestureDetector(
+                onTap: () {
+                  openSettings();
+                },
+                child: Container(
+                  height: 60,
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: const Color(0xff483553),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      // Icon(
+                      //   Icons.settings_input_composite_outlined,
+                      //   color: Colors.white,
+                      // ),
+                      FaIcon(
+                        FontAwesomeIcons.sliders,
+                        color: Color(0xffD8CA67),
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        height: 7,
+                      ),
+                      Text(
+                        'Settings',
+                        style: TextStyle(
+                          color: Color(0xffDADAC2),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
+          // Column(
+          //   children: [
+          //     GestureDetector(
+          //       onTap: () async {
+          //         await playAffirmations();
+          //       },
+          //       child: Container(
+          //         height: 60,
+          //         width: 100,
+          //         decoration: BoxDecoration(
+          //           color: const Color(0xff483553),
+          //           borderRadius: BorderRadius.circular(10),
+          //         ),
+          //         child: Column(
+          //           mainAxisAlignment: MainAxisAlignment.center,
+          //           children: const [
+          //             FaIcon(
+          //               FontAwesomeIcons.recordVinyl,
+          //               color: Color(0xffD8CA67),
+          //               size: 20,
+          //             ),
+          //             SizedBox(
+          //               height: 7,
+          //             ),
+          //             Text(
+          //               'Mix Affirmations',
+          //               style: TextStyle(
+          //                 color: Color(0xffDADAC2),
+          //               ),
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40.0),
+            padding: const EdgeInsets.all(30.0),
             child: Column(
               children: [
                 Center(
@@ -568,19 +773,29 @@ class _PlayScreenState extends State<PlayScreen> {
                       fontFamily: 'Rubik',
                       color: Color(0xffDADAC2),
                     ),
+                    maxLines: 3,
+                    overflow: TextOverflow.fade,
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                //SizedBox(height: 5),
+                Container(
+                  height: 1,
+                  width: double.infinity,
+                  color: Colors.black12,
+                ),
                 Text(
                   //'Imagine Dragons',
                   //widget.recording.toString(),
                   finalPlaylistName,
                   style: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Rubik',
                     color: Color(0xffDADAC2),
                   ),
+                  maxLines: 3,
+                  overflow: TextOverflow.fade,
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
@@ -588,89 +803,180 @@ class _PlayScreenState extends State<PlayScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              const FaIcon(
-                FontAwesomeIcons.arrowsRotate,
-                color: Color(0xffDADAC2),
-                size: 20,
-              ),
-              const FaIcon(
-                FontAwesomeIcons.backward,
-                color: Color(0xffDADAC2),
-                size: 30,
+              GestureDetector(
+                onTap: () {
+                  songPlayer.loopMode == LoopMode.one
+                      ? songPlayer.setLoopMode(LoopMode.all)
+                      : songPlayer.setLoopMode(LoopMode.one);
+                },
+                // child: const FaIcon(
+                //   FontAwesomeIcons.arrowsRotate,
+                //   color: Color(0xffDADAC2),
+                //   size: 20,
+                // ),
+                child: StreamBuilder<LoopMode>(
+                  stream: songPlayer.loopModeStream,
+                  builder: (context, snapshot) {
+                    final loopMode = snapshot.data;
+                    if (LoopMode.one == loopMode) {
+                      return const FaIcon(
+                        FontAwesomeIcons.retweet,
+                        color: Color(0xffDADAC2),
+                      );
+                    }
+                    return const FaIcon(
+                      FontAwesomeIcons.repeat,
+                      color: Color(0xffDADAC2),
+                    );
+                  },
+                ),
               ),
               GestureDetector(
-                // onTap: () async {
-                //   playRecordAnimation();
-                //   await songPlayer
-                //       .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
-                //   await songPlayer.setVolume(0.02);
-                //   for (int i = 0; i < setsOfTagsPath.length; i++) {
-                //     print('Now Playing =====> ${setsOfTagsPath[i]}');
-                //     //print(setsOfTagsPath[i]);
-                //     await affirmationPlayer.setAudioSource(
-                //         AudioSource.uri(Uri.parse(setsOfTagsPath[i])));
-                //     await affirmationPlayer.setVolume(1.0);
-                //     await affirmationPlayer.play();
-                //   }
-                //   songPlayer.play();
-                //   setState(() {});
-                // },
+                onTap: () {
+                  print('Previous Track');
+                  if (songPlayer.hasPrevious) {
+                    songPlayer.seekToPrevious();
+                  }
+                },
+                child: const FaIcon(
+                  FontAwesomeIcons.backward,
+                  color: Color(0xffDADAC2),
+                  size: 30,
+                ),
+              ),
+              GestureDetector(
                 onTap: () async {
-                  playRecordAnimation();
-                  await songPlayer
-                      .setAudioSource(AudioSource.uri(Uri.parse(finalUri)));
-                  await songPlayer.setVolume(0.02);
-                  songPlayer.play();
-                  for (int x = 0; x <= setsOfTagsPath.length; x++) {
-                    await affirmationPlayer.setAudioSource(
-                      ConcatenatingAudioSource(
-                        useLazyPreparation: true,
-                        shuffleOrder: DefaultShuffleOrder(),
-                        children: [
-                          AudioSource.uri(Uri.parse(setsOfTagsPath[x])),
-                        ],
-                      ),
-                    );
-                    //await affirmationPlayer.setLoopMode(LoopMode.one);
-                    await affirmationPlayer.play();
+                  if (finalSong.isEmpty || finalPlaylistName.isEmpty) {
+                    print(
+                        'Song is: $finalSong and Playlist is: $finalPlaylistName');
+                    toast(context, 'Select song and affirmation to play!');
+                  } else {
+                    playRecordAnimation();
+                    togglePlayback();
                   }
                   setState(() {});
                 },
+                child: isPlaying == false
+                    ? const FaIcon(
+                        FontAwesomeIcons.play,
+                        color: Color(0xffDADAC2),
+                        size: 50,
+                      )
+                    : const FaIcon(
+                        FontAwesomeIcons.pause,
+                        color: Color(0xffDADAC2),
+                        size: 50,
+                      ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  print('Next Track');
+                  if (songPlayer.hasNext) {
+                    songPlayer.seekToNext();
+                  }
+                },
                 child: const FaIcon(
-                  FontAwesomeIcons.play,
+                  FontAwesomeIcons.forward,
                   color: Color(0xffDADAC2),
-                  size: 50,
+                  size: 30,
                 ),
               ),
-              const FaIcon(
-                FontAwesomeIcons.forward,
-                color: Color(0xffDADAC2),
-                size: 30,
-              ),
-              const FaIcon(
-                FontAwesomeIcons.shuffle,
-                color: Color(0xffDADAC2),
-                size: 20,
+              GestureDetector(
+                onTap: () {
+                  songPlayer.setShuffleModeEnabled(true);
+                  toast(context, 'Shuffle Enabled');
+                },
+                child: const FaIcon(
+                  FontAwesomeIcons.shuffle,
+                  color: Color(0xffDADAC2),
+                  size: 20,
+                ),
               ),
             ],
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 50.0, top: 50.0),
-            child: LinearPercentIndicator(
-              width: MediaQuery.of(context).size.width,
-              animation: true,
-              lineHeight: 10.0,
-              animationDuration: 2500,
-              percent: 0.8,
-              barRadius: const Radius.circular(5),
-              // progressColor: Colors.white,
-              // backgroundColor: const Color(0xffb7b8d7),
-              progressColor: const Color(0xffD8CA67),
-              backgroundColor: const Color(0xffDADAC2),
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                StreamBuilder<DurationState>(
+                  stream: durationStateStream,
+                  builder: (context, snapshot) {
+                    final durationState = snapshot.data;
+                    final progress = durationState?.position ?? Duration.zero;
+                    final total = durationState?.total ?? Duration.zero;
+                    return ProgressBar(
+                      progress: progress,
+                      total: total,
+                      barHeight: 15.0,
+                      baseBarColor: const Color(0xffDADAC2),
+                      progressBarColor: const Color(0xffD8CA67),
+                      thumbColor: const Color(0xffD8CA67),
+                      timeLabelTextStyle: const TextStyle(fontSize: 1),
+                      onSeek: (duration) {
+                        songPlayer.seek(duration);
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                StreamBuilder<DurationState>(
+                  stream: durationStateStream,
+                  builder: (context, snapshot) {
+                    final durationState = snapshot.data;
+                    final progress = durationState?.position ?? Duration.zero;
+                    final total = durationState?.total ?? Duration.zero;
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Text(
+                          progress.toString().split(".")[0],
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          total.toString().split(".")[0],
+                          style: const TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 20.0),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+
+  ConcatenatingAudioSource createPlaylist(List<SongModel> songs) {
+    List<AudioSource> sources = [];
+    for (var song in songs) {
+      sources.add(AudioSource.uri(Uri.parse(song.uri!)));
+    }
+    return ConcatenatingAudioSource(children: sources);
+  }
+
+  void updateCurrentPlayingSongDetails(int index) {
+    setState(() {
+      if (songs.isNotEmpty) {
+        currentSongTitle = songs[index].title;
+        currentIndex = index;
+      }
+    });
+  }
+}
+
+class DurationState {
+  DurationState({this.position = Duration.zero, this.total = Duration.zero});
+  Duration position, total;
 }

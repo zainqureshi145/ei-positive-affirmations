@@ -31,9 +31,9 @@ class _MyAppState extends State<MyApp> {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      home: RecordingScreen(),
+      //home: RecordingScreen(),
       //home: PlayScreen(),
-      //home: OnBoardingScreen(),
+      home: OnBoardingScreen(),
     );
   }
 }
